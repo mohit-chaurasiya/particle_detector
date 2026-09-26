@@ -6,8 +6,8 @@ const WINDOW_HEIGHT = 500;
 const TITLE = "Particle Detector";
 const FPS = 50;
 
-const SCANNER_WIDTH = WINDOW_WIDTH / 20;
-const SCANNER_HEIGHT = WINDOW_HEIGHT;
+const HORIZONTAL_SCANNER_WIDTH = WINDOW_WIDTH / 20;
+const HORIZONTAL_SCANNER_HEIGHT = WINDOW_HEIGHT;
 
 const FIRST_PARTICLE_WIDTH = WINDOW_WIDTH / 8;
 const FIRST_PARTICLE_HEIGHT = WINDOW_HEIGHT;
@@ -19,8 +19,14 @@ const SECOND_PARTICLE_HEIGHT = WINDOW_HEIGHT;
 const SECOND_PARTICLE_X = FIRST_PARTICLE_X + 300;
 const SECOND_PARTICLE_Y = FIRST_PARTICLE_Y;
 
+const VERTICAL_PARTICAL_X = 0;
+const VERTICAL_PARTICAL_Y = WINDOW_HEIGHT / 2
+const VERTICAL_PARTICAL_HEIGHT = WINDOW_HEIGHT / 10;
+const VERTICAL_SCANNER_HEIGHT = WINDOW_HEIGHT / 20;
+
 const speedForLeftScanner = 1;
 const speedForRightScanner = 5;
+const speedForVerticalScanner = 1;
 
 
 function running() {
@@ -35,31 +41,38 @@ function setup() {
 let leftScannerX = 0;
 let leftScannerY = 0;
 let leftColor = r.WHITE;
-let maxPosForLeft = FIRST_PARTICLE_X + FIRST_PARTICLE_WIDTH - SCANNER_WIDTH;
+let maxPosForLeft = FIRST_PARTICLE_X + FIRST_PARTICLE_WIDTH - HORIZONTAL_SCANNER_WIDTH;
 let minPosForLeft = 0
+
 let rightScannerX = FIRST_PARTICLE_X + FIRST_PARTICLE_WIDTH;
 let rightScannerY = 0;
 let rightColor = r.WHITE;
-let maxPosForRight = WINDOW_WIDTH - SCANNER_WIDTH;
+let maxPosForRight = WINDOW_WIDTH - HORIZONTAL_SCANNER_WIDTH;
 let minPosForRight = FIRST_PARTICLE_X + FIRST_PARTICLE_WIDTH
 
+let verticalScannerY = 0;
+let verticalColor = r.WHITE;
+let maxPosForVertical = WINDOW_HEIGHT - WINDOW_HEIGHT / 20;
 
 
 function update() {
-    const leftScannerRange = leftScannerX + SCANNER_WIDTH;
-    const rightScannerRange = rightScannerX + SCANNER_WIDTH;
+    const leftScannerRange = leftScannerX + HORIZONTAL_SCANNER_WIDTH;
+    const rightScannerRange = rightScannerX + HORIZONTAL_SCANNER_WIDTH;
     const particleRange = FIRST_PARTICLE_X + FIRST_PARTICLE_WIDTH;
     const secondParticleRange = SECOND_PARTICLE_X + SECOND_PARTICLE_WIDTH;
+    const verticalScannerRange = verticalScannerY + VERTICAL_SCANNER_HEIGHT
+    const verticalParticleRange = VERTICAL_PARTICAL_Y + VERTICAL_PARTICAL_HEIGHT
 
     leftScannerX += (geometry.checkCollideForLeft(leftScannerX, maxPosForLeft, minPosForLeft)) ? speedForLeftScanner : -(speedForLeftScanner);
     rightScannerX += (geometry.checkCollideForRight(rightScannerX, maxPosForRight, minPosForRight)) ? speedForRightScanner : -(speedForRightScanner);
+    verticalScannerY += (geometry.checkCollideForVertical(verticalScannerY, maxPosForVertical, 0)) ? speedForVerticalScanner : -(speedForVerticalScanner);
+
+
     // leftColor = geometry.checkOverlap(leftScannerRange, leftScannerX, particleRange, FIRST_PARTICLE_X) ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
     leftColor = geometry.checkOverlap(particleRange, FIRST_PARTICLE_X, leftScannerRange, leftScannerX) ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
-    // rightColor = (geometry.checkOverlap(rightScannerRange, rightScannerX, secondParticleRange, SECOND_PARTICLE_X)) ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
     rightColor = (geometry.checkOverlap(rightScannerRange, rightScannerX, secondParticleRange, SECOND_PARTICLE_X)) ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
-
-
-
+    // rightColor = (geometry.checkOverlap(rightScannerRange, rightScannerX, secondParticleRange, SECOND_PARTICLE_X)) ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
+    verticalColor = (geometry.checkOverlap(verticalScannerRange, verticalScannerY, verticalParticleRange, VERTICAL_PARTICAL_Y)) ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
 }
 
 function drawScanner(posX, posY, width, height, color) {
@@ -77,8 +90,10 @@ function draw() {
 
     drawParticles(FIRST_PARTICLE_X, FIRST_PARTICLE_Y, FIRST_PARTICLE_WIDTH, FIRST_PARTICLE_HEIGHT);
     drawParticles(SECOND_PARTICLE_X, SECOND_PARTICLE_Y, SECOND_PARTICLE_WIDTH, SECOND_PARTICLE_HEIGHT);
-    drawScanner(leftScannerX, leftScannerY, SCANNER_WIDTH, SCANNER_HEIGHT, leftColor);
-    drawScanner(rightScannerX, rightScannerY, SCANNER_WIDTH, SCANNER_HEIGHT, rightColor);
+    drawParticles(VERTICAL_PARTICAL_X, VERTICAL_PARTICAL_Y, WINDOW_WIDTH, VERTICAL_PARTICAL_HEIGHT);
+    drawScanner(leftScannerX, leftScannerY, HORIZONTAL_SCANNER_WIDTH, HORIZONTAL_SCANNER_HEIGHT, leftColor);
+    drawScanner(rightScannerX, rightScannerY, HORIZONTAL_SCANNER_WIDTH, HORIZONTAL_SCANNER_HEIGHT, rightColor);
+    drawScanner(0, verticalScannerY, WINDOW_WIDTH, VERTICAL_SCANNER_HEIGHT, verticalColor);
 
     // code end
     r.EndDrawing();
