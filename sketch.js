@@ -1,5 +1,5 @@
 const r = require('raylib');
-const math = require('./math')
+const geometry = require('./geometry')
 
 const WINDOW_WIDTH = 800;
 const WINDOW_HEIGHT = 500;
@@ -25,13 +25,18 @@ function setup() {
 
 let scannerX = 0;
 let scannerY = 0;
-let color = r.WHITE;
+let color;
 let maxPos = WINDOW_WIDTH - SCANNER_WIDTH;
 let minPos = 0
 
+
 function update() {
 
-    (math.checkCollide(scannerX, maxPos, minPos)) ? scannerX++ : scannerX--;
+    const scannerRange = scannerX + SCANNER_WIDTH;
+    const particleRange = PARTICLE_X + PARTICLE_WIDTH
+
+    scannerX += (geometry.checkCollide(scannerX, maxPos, minPos)) ? 5 : -5;
+    color = geometry.checkOverlap(scannerRange, scannerX, particleRange, PARTICLE_X) ? r.RED : r.WHITE;
 
 }
 
@@ -39,8 +44,8 @@ function drawScanner() {
     r.DrawRectangle(scannerX, scannerY, SCANNER_WIDTH, SCANNER_HEIGHT, color)
 }
 
-function drawParticles(x, y, w, h) {
-    r.DrawRectangle(x, y, w, h, r.BLUE);
+function drawParticles(posX, posY, width, height) {
+    r.DrawRectangle(posX, posY, width, height, r.BLUE);
 }
 
 function draw() {
