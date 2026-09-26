@@ -11,22 +11,27 @@ const HORIZONTAL_SCANNER_HEIGHT = WINDOW_HEIGHT;
 
 const FIRST_PARTICLE_WIDTH = WINDOW_WIDTH / 8;
 const FIRST_PARTICLE_HEIGHT = WINDOW_HEIGHT;
-const FIRST_PARTICLE_X = WINDOW_WIDTH / 2 - FIRST_PARTICLE_WIDTH;
+const FIRST_PARTICLE_X = 100;
 const FIRST_PARTICLE_Y = 0;
 
 const SECOND_PARTICLE_WIDTH = 5;
 const SECOND_PARTICLE_HEIGHT = WINDOW_HEIGHT;
-const SECOND_PARTICLE_X = FIRST_PARTICLE_X + 300;
+const SECOND_PARTICLE_X = 450
 const SECOND_PARTICLE_Y = FIRST_PARTICLE_Y;
 
 const VERTICAL_PARTICAL_X = 0;
 const VERTICAL_PARTICAL_Y = WINDOW_HEIGHT / 2
 const VERTICAL_PARTICAL_HEIGHT = WINDOW_HEIGHT / 10;
+
 const VERTICAL_SCANNER_HEIGHT = WINDOW_HEIGHT / 20;
 
 const speedForLeftScanner = 1;
 const speedForRightScanner = 5;
 const speedForVerticalScanner = 1;
+
+const LEFT_CHECK = 1;
+const RIGHT_CHECK = 2;
+const VERTICAL_CHECK = 3;
 
 
 function running() {
@@ -41,14 +46,14 @@ function setup() {
 let leftScannerX = 0;
 let leftScannerY = 0;
 let leftColor = r.WHITE;
-let maxPosForLeft = FIRST_PARTICLE_X + FIRST_PARTICLE_WIDTH - HORIZONTAL_SCANNER_WIDTH;
+let maxPosForLeft = WINDOW_WIDTH / 2 - HORIZONTAL_SCANNER_WIDTH;
 let minPosForLeft = 0
 
-let rightScannerX = FIRST_PARTICLE_X + FIRST_PARTICLE_WIDTH;
+let rightScannerX = WINDOW_WIDTH / 2;
 let rightScannerY = 0;
 let rightColor = r.WHITE;
 let maxPosForRight = WINDOW_WIDTH - HORIZONTAL_SCANNER_WIDTH;
-let minPosForRight = FIRST_PARTICLE_X + FIRST_PARTICLE_WIDTH
+let minPosForRight = WINDOW_WIDTH / 2;
 
 let verticalScannerY = 0;
 let verticalColor = r.WHITE;
@@ -63,9 +68,9 @@ function update() {
     const verticalScannerRange = verticalScannerY + VERTICAL_SCANNER_HEIGHT
     const verticalParticleRange = VERTICAL_PARTICAL_Y + VERTICAL_PARTICAL_HEIGHT
 
-    leftScannerX += (geometry.checkCollideForLeft(leftScannerX, maxPosForLeft, minPosForLeft)) ? speedForLeftScanner : -(speedForLeftScanner);
-    rightScannerX += (geometry.checkCollideForRight(rightScannerX, maxPosForRight, minPosForRight)) ? speedForRightScanner : -(speedForRightScanner);
-    verticalScannerY += (geometry.checkCollideForVertical(verticalScannerY, maxPosForVertical, 0)) ? speedForVerticalScanner : -(speedForVerticalScanner);
+    leftScannerX += (geometry.checkCollision(leftScannerX, maxPosForLeft, minPosForLeft, LEFT_CHECK)) ? speedForLeftScanner : -(speedForLeftScanner);
+    rightScannerX += (geometry.checkCollision(rightScannerX, maxPosForRight, minPosForRight, RIGHT_CHECK)) ? speedForRightScanner : -(speedForRightScanner);
+    verticalScannerY += (geometry.checkCollision(verticalScannerY, maxPosForVertical, 0, VERTICAL_CHECK)) ? speedForVerticalScanner : -(speedForVerticalScanner);
 
 
     // leftColor = geometry.checkOverlap(leftScannerRange, leftScannerX, particleRange, FIRST_PARTICLE_X) ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
@@ -91,6 +96,7 @@ function draw() {
     drawParticles(FIRST_PARTICLE_X, FIRST_PARTICLE_Y, FIRST_PARTICLE_WIDTH, FIRST_PARTICLE_HEIGHT);
     drawParticles(SECOND_PARTICLE_X, SECOND_PARTICLE_Y, SECOND_PARTICLE_WIDTH, SECOND_PARTICLE_HEIGHT);
     drawParticles(VERTICAL_PARTICAL_X, VERTICAL_PARTICAL_Y, WINDOW_WIDTH, VERTICAL_PARTICAL_HEIGHT);
+
     drawScanner(leftScannerX, leftScannerY, HORIZONTAL_SCANNER_WIDTH, HORIZONTAL_SCANNER_HEIGHT, leftColor);
     drawScanner(rightScannerX, rightScannerY, HORIZONTAL_SCANNER_WIDTH, HORIZONTAL_SCANNER_HEIGHT, rightColor);
     drawScanner(0, verticalScannerY, WINDOW_WIDTH, VERTICAL_SCANNER_HEIGHT, verticalColor);
