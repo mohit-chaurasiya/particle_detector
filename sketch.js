@@ -53,7 +53,9 @@ function update() {
 
     leftScannerX += (geometry.checkCollideForLeft(leftScannerX, maxPosForLeft, minPosForLeft)) ? speedForLeftScanner : -(speedForLeftScanner);
     rightScannerX += (geometry.checkCollideForRight(rightScannerX, maxPosForRight, minPosForRight)) ? speedForRightScanner : -(speedForRightScanner);
-    leftColor = geometry.checkOverlap(leftScannerRange, leftScannerX, particleRange, FIRST_PARTICLE_X) ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
+    // leftColor = geometry.checkOverlap(leftScannerRange, leftScannerX, particleRange, FIRST_PARTICLE_X) ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
+    leftColor = geometry.checkOverlap(particleRange, FIRST_PARTICLE_X, leftScannerRange, leftScannerX) ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
+    // rightColor = (geometry.checkOverlap(rightScannerRange, rightScannerX, secondParticleRange, SECOND_PARTICLE_X)) ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
     rightColor = (geometry.checkOverlap(rightScannerRange, rightScannerX, secondParticleRange, SECOND_PARTICLE_X)) ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
 
 
