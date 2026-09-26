@@ -9,16 +9,18 @@ const FPS = 50;
 const SCANNER_WIDTH = WINDOW_WIDTH / 20;
 const SCANNER_HEIGHT = WINDOW_HEIGHT;
 
-const PARTICLE_WIDTH = WINDOW_WIDTH / 8;
-const PARTICLE_HEIGHT = WINDOW_HEIGHT;
-const PARTICLE_X = WINDOW_WIDTH / 2 - PARTICLE_WIDTH;
-const PARTICLE_Y = 0;
+const FIRST_PARTICLE_WIDTH = WINDOW_WIDTH / 8;
+const FIRST_PARTICLE_HEIGHT = WINDOW_HEIGHT;
+const FIRST_PARTICLE_X = WINDOW_WIDTH / 2 - FIRST_PARTICLE_WIDTH;
+const FIRST_PARTICLE_Y = 0;
 
 const SECOND_PARTICLE_WIDTH = 5;
 const SECOND_PARTICLE_HEIGHT = WINDOW_HEIGHT;
-const SECOND_PARTICLE_X = PARTICLE_X + 300;
-const SECOND_PARTICLE_Y = PARTICLE_Y;
+const SECOND_PARTICLE_X = FIRST_PARTICLE_X + 300;
+const SECOND_PARTICLE_Y = FIRST_PARTICLE_Y;
 
+const speedForLeftScanner = 1;
+const speedForRightScanner = 5;
 
 
 function running() {
@@ -30,33 +32,40 @@ function setup() {
     r.SetTargetFPS(FPS);
 }
 
-let scannerX = 0;
-let scannerY = 0;
-let color;
-let maxPos = WINDOW_WIDTH - SCANNER_WIDTH;
-let minPos = 0
+let leftScannerX = 0;
+let leftScannerY = 0;
+let leftColor = r.WHITE;
+let maxPosForLeft = FIRST_PARTICLE_X + FIRST_PARTICLE_WIDTH - SCANNER_WIDTH;
+let minPosForLeft = 0
+let rightScannerX = FIRST_PARTICLE_X + FIRST_PARTICLE_WIDTH;
+let rightScannerY = 0;
+let rightColor = r.WHITE;
+let maxPosForRight = WINDOW_WIDTH - SCANNER_WIDTH;
+let minPosForRight = FIRST_PARTICLE_X + FIRST_PARTICLE_WIDTH
+
 
 
 function update() {
-
-    const scannerRange = scannerX + SCANNER_WIDTH;
-    const particleRange = PARTICLE_X + PARTICLE_WIDTH
+    const leftScannerRange = leftScannerX + SCANNER_WIDTH;
+    const rightScannerRange = rightScannerX + SCANNER_WIDTH;
+    const particleRange = FIRST_PARTICLE_X + FIRST_PARTICLE_WIDTH;
     const secondParticleRange = SECOND_PARTICLE_X + SECOND_PARTICLE_WIDTH;
 
-    scannerX += (geometry.checkCollide(scannerX, maxPos, minPos)) ? 1 : -1;
-    color = geometry.checkOverlap(scannerRange, scannerX, particleRange, PARTICLE_X) ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
-    if (geometry.checkOverlap(scannerRange, scannerX, secondParticleRange, SECOND_PARTICLE_X)) {
-        color = r.ColorAlpha(r.RED, 0.7);
-    }
+    leftScannerX += (geometry.checkCollideForLeft(leftScannerX, maxPosForLeft, minPosForLeft)) ? speedForLeftScanner : -(speedForLeftScanner);
+    rightScannerX += (geometry.checkCollideForRight(rightScannerX, maxPosForRight, minPosForRight)) ? speedForRightScanner : -(speedForRightScanner);
+    leftColor = geometry.checkOverlap(leftScannerRange, leftScannerX, particleRange, FIRST_PARTICLE_X) ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
+    rightColor = (geometry.checkOverlap(rightScannerRange, rightScannerX, secondParticleRange, SECOND_PARTICLE_X)) ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
+
+
 
 }
 
-function drawScanner() {
-    r.DrawRectangle(scannerX, scannerY, SCANNER_WIDTH, SCANNER_HEIGHT, color);
+function drawScanner(posX, posY, width, height, color) {
+    r.DrawRectangle(posX, posY, width, height, color);
 }
 
 function drawParticles(posX, posY, width, height) {
-    r.DrawRectangle(posX, posY, width, height, r.BLUE);
+    r.DrawRectangle(posX, posY, width, height, r.SKYBLUE);
 }
 
 function draw() {
@@ -64,12 +73,10 @@ function draw() {
     r.ClearBackground(r.BLACK);
     // write code from here
 
-    drawParticles(PARTICLE_X, PARTICLE_Y, PARTICLE_WIDTH, PARTICLE_HEIGHT);
+    drawParticles(FIRST_PARTICLE_X, FIRST_PARTICLE_Y, FIRST_PARTICLE_WIDTH, FIRST_PARTICLE_HEIGHT);
     drawParticles(SECOND_PARTICLE_X, SECOND_PARTICLE_Y, SECOND_PARTICLE_WIDTH, SECOND_PARTICLE_HEIGHT);
-    drawScanner();
-
-
-
+    drawScanner(leftScannerX, leftScannerY, SCANNER_WIDTH, SCANNER_HEIGHT, leftColor);
+    drawScanner(rightScannerX, rightScannerY, SCANNER_WIDTH, SCANNER_HEIGHT, rightColor);
 
     // code end
     r.EndDrawing();
