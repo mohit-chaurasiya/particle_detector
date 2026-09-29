@@ -1,39 +1,35 @@
-let flagRight = 1;
-let flagLeft = 1;
-let flagVertical = 1
 
-function checkCollision(pos, max, min, check) {
-    if (check === 1) {
-        return flagLeft = (pos <= max && flagLeft === 1) || pos === min ? 1 : 0;
-    }
-    if (check === 2) {
-        return flagRight = (pos <= max && flagRight === 1) || pos === min ? 1 : 0;
-    }
-    if (check === 3) {
-        return flagVertical = (pos <= max && flagVertical === 1) || pos === min ? 1 : 0;
-    }
+function isOverlap(scannerStart, scannerEnd, particleStart, particleEnd) {
+    return (scannerStart < particleEnd && particleStart < scannerEnd)
 }
 
-// function checkCollideForLeft(pos, max, min,) {
-//     return flagLeft = (pos <= max && flagLeft === 1) || pos === min ? 1 : 0;
-// }
 
-// function checkCollideForRight(pos, max, min,) {
-//     return flagRight = (pos <= max && flagRight === 1) || pos === min ? 1 : 0;
-// }
-
-// function checkCollideForVertical(pos, max, min,) {
-//     return flagVertical = (pos <= max && flagVertical === 1) || pos === min ? 1 : 0;
-// }
-function checkOverlap(range1, scanX, range2, partX) {
-    return (range1 > partX && range2 > scanX) ? 1 : 0;
+function getNewVelocity(posX, upperBound, lowerBound, width, velocity) {
+    let isScannerOut = isScannerOutOfBound(posX, upperBound, lowerBound, width);
+    return isScannerOut ? -velocity : velocity;
 }
+
+function calcNextPosition(start, velocity) {
+    return start + velocity;
+}
+
+function isScannerOutOfBound(posX, upperBound, lowerBound) {
+    return posX > upperBound || posX < lowerBound;
+
+}
+function hasOverlaped(scannerStart, scannerEnd, particle1Start, particle1End, particle2Start, particle2End) {
+    console.log(isOverlap(scannerStart, scannerEnd, particle1Start, particle1End))
+    return (isOverlap(scannerStart, scannerEnd, particle1Start, particle1End)
+        || isOverlap(scannerStart, scannerEnd, particle2Start, particle2End))
+}
+
+
 
 module.exports = {
-    // checkCollideForRight,
-    checkOverlap,
-    // checkCollideForLeft,
-    // checkCollideForVertical,
-    checkCollision
+
+    isOverlap,
+    calcNextPosition,
+    getNewVelocity,
+    hasOverlaped,
 
 }
