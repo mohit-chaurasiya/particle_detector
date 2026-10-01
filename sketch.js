@@ -1,95 +1,71 @@
 const r = require('raylib');
-const geometry = require('./geometry')
-const p1 = require('./particle1')
-const p2 = require('./particle2')
-const vP = require('./verticalParticle')
-const s1 = require('./scanner1')
-const s2 = require('./scanner2')
-const vS = require('./verticalScanner')
+const s = require('./scanner')
+const p = require('./particle')
 
-const WINDOW_WIDTH = 800;
-const WINDOW_HEIGHT = 500;
-const TITLE = "Particle Detector";
-const FPS = 50;
 
 function running() {
     return !r.WindowShouldClose();
 }
 
-function setup() {
+function setup(WINDOW_WIDTH, WINDOW_HEIGHT, TITLE, FPS) {
     r.SetTraceLogLevel(r.LOG_NONE);
     r.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, TITLE);
     r.SetTargetFPS(FPS);
+
+    const world = {}
+
+    world.s1 = s.createScanner(0, 0, r.GetScreenWidth() / 8, r.GetScreenHeight());
+    world.s1.velocity = 1;
+    world.s1.lower = 0;
+    world.s1.upper = r.GetScreenWidth() / 2 - world.s1.width;
+    world.s1.color = r.WHITE;
+
+    world.s2 = s.createScanner(r.GetScreenWidth() / 2, 0, 20, r.GetScreenHeight());
+    world.s2.velocity = 3;
+    world.s2.lower = r.GetScreenWidth() / 2;
+    world.s2.upper = r.GetScreenWidth() - world.s2.width;
+    world.s2.color = r.WHITE;
+
+    world.s3 = s.createScanner(0, 0, r.GetScreenWidth(), 80);
+    world.s3.velocity = 3;
+    world.s3.lower = 0;
+    world.s3.upper = r.GetScreenHeight() - world.s3.height;
+    world.s3.color = r.WHITE;
+
+
+    world.p1 = p.createParticle(300, 0, 100, r.GetScreenHeight())
+    world.p1.color = r.SKYBLUE
+
+    world.p2 = p.createParticle(550, 0, 10, r.GetScreenHeight(),)
+    world.p2.color = r.SKYBLUE
+
+    world.p3 = p.createParticle(0, r.GetScreenHeight() / 2, r.GetScreenWidth(), 100)
+    world.p3.color = r.SKYBLUE
+
+
+
+    return world;
+
 }
 
-function colorSelector(scannerStart, scannerEnd, particle1Start, particle1End, particle2Start, particle2End) {
-    let isOverlapping = geometry.hasOverlaped(scannerStart, scannerEnd, particle1Start, particle1End, particle2Start, particle2End);
-    let color = isOverlapping ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
-    return color
-}
-
-function updateScanner3() {
-
-    const verticalScannerEnd = vS.posY + vS.height
-    const verticalParticleEnd = vP.posY + vP.height
-
-    vS.velocity = geometry.getNewVelocity(vS.posY, vS.maxPos, vS.minPos, vS.height, vS.velocity);
-    vS.posY = geometry.calcNextPosition(vS.posY, vS.velocity);
-    vS.color = colorSelector(vS.posY, verticalScannerEnd, vP.posY, verticalParticleEnd);
-
-}
-
-function updateScanner2() {
-    const secondParticleEnd = p2.posX + p2.width;
-    const scanner2End = s2.posX + s2.width;
-    const firstParticleEnd = p1.posX + p1.width;
-
-    s2.velocity = geometry.getNewVelocity(s2.posX, s2.maxPos, s2.minPos, s2.width, s2.velocity);
-    s2.posX = geometry.calcNextPosition(s2.posX, s2.velocity);
-    s2.color = colorSelector(s2.posX, scanner2End, p1.posX, firstParticleEnd, p2.posX, secondParticleEnd);
-}
-
-function updateScanner1() {
-
-    const secondParticleEnd = p2.posX + p2.width;
-    const scanner1End = s1.posX + s1.width;
-    const firstParticleEnd = p1.posX + p1.width;
-
-    s1.velocity = geometry.getNewVelocity(s1.posX, s1.maxPos, s1.minPos, s1.width, s1.velocity);
-    s1.posX = geometry.calcNextPosition(s1.posX, s1.velocity);
-    s1.color = colorSelector(s1.posX, scanner1End, p1.posX, firstParticleEnd, p2.posX, secondParticleEnd);
-}
-
-function updateScanners() {
-    updateScanner1();
-    updateScanner2();
-    updateScanner3();
+function update(world) {
+    s.updateHorzintalScanner(world.s1, world.p1, world.p2);
+    s.updateHorzintalScanner(world.s2, world.p1, world.p2);
+    s.verticalScanner(world.s3, world.p3);
 }
 
 
-function update() {
-    updateScanners();
-}
-
-function drawScanner() {
-    r.DrawRectangle(s1.posX, 0, s1.width, s1.height, s1.color);
-    r.DrawRectangle(s2.posX, 0, s2.width, s2.height, s2.color);
-    r.DrawRectangle(0, vS.posY, WINDOW_WIDTH, vS.height, vS.color);
-}
-
-function drawParticles() {
-    const color = r.SKYBLUE;
-    r.DrawRectangle(p1.posX, 0, p1.width, p1.height, color);
-    r.DrawRectangle(p2.posX, 0, p2.width, p2.height, color);
-    r.DrawRectangle(0, vP.posY, WINDOW_WIDTH, vP.height, color);
-}
-
-function draw() {
+function draw(world) {
     r.BeginDrawing();
     r.ClearBackground(r.BLACK);
 
-    drawParticles();
-    drawScanner();
+    p.draw(world.p1);
+    p.draw(world.p2);
+    p.draw(world.p3);
+
+    s.draw(world.s1);
+    s.draw(world.s2);
+    s.draw(world.s3);
 
     r.EndDrawing();
 }
