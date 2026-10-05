@@ -2,70 +2,53 @@ const r = require('raylib');
 const s = require('./scanner')
 const p = require('./particle')
 
-
 function running() {
     return !r.WindowShouldClose();
 }
 
-function setup(WINDOW_WIDTH, WINDOW_HEIGHT, TITLE, FPS) {
+function setup(window) {
     r.SetTraceLogLevel(r.LOG_NONE);
-    r.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, TITLE);
-    r.SetTargetFPS(FPS);
+    r.InitWindow(window.width, window.height, window.title);
+    r.SetTargetFPS(window.FPS);
 
-    const world = {}
+    const data = {};
 
-    world.s1 = s.createScanner(0, 0, r.GetScreenWidth() / 8, r.GetScreenHeight());
-    world.s1.velocity = 1;
-    world.s1.lower = 0;
-    world.s1.upper = r.GetScreenWidth() / 2 - world.s1.width;
-    world.s1.color = r.WHITE;
+    data.s1 = s.createScanner(0, 0, r.GetScreenWidth() / 8, r.GetScreenHeight(), 1, r.WHITE);
+    data.s1.lower = 0;
+    data.s1.upper = r.GetScreenWidth() / 2 - data.s1.width;
 
-    world.s2 = s.createScanner(r.GetScreenWidth() / 2, 0, 20, r.GetScreenHeight());
-    world.s2.velocity = 3;
-    world.s2.lower = r.GetScreenWidth() / 2;
-    world.s2.upper = r.GetScreenWidth() - world.s2.width;
-    world.s2.color = r.WHITE;
+    data.s2 = s.createScanner(r.GetScreenWidth() / 2, 0, 20, r.GetScreenHeight(), 3, r.WHITE);
+    data.s2.lower = r.GetScreenWidth() / 2;
+    data.s2.upper = r.GetScreenWidth() - data.s2.width;
 
-    world.s3 = s.createScanner(0, 0, r.GetScreenWidth(), 80);
-    world.s3.velocity = 3;
-    world.s3.lower = 0;
-    world.s3.upper = r.GetScreenHeight() - world.s3.height;
-    world.s3.color = r.WHITE;
+    data.s3 = s.createScanner(0, 0, r.GetScreenWidth(), 80, 3, r.WHITE);
+    data.s3.lower = 0;
+    data.s3.upper = r.GetScreenHeight() - data.s3.height;
 
+    data.p1 = p.createParticle(300, 0, 100, r.GetScreenHeight(), r.SKYBLUE);
+    data.p2 = p.createParticle(550, 0, 10, r.GetScreenHeight(), r.SKYBLUE);
+    data.p3 = p.createParticle(0, r.GetScreenHeight() / 2, r.GetScreenWidth(), 100, r.SKYBLUE);
 
-    world.p1 = p.createParticle(300, 0, 100, r.GetScreenHeight())
-    world.p1.color = r.SKYBLUE
-
-    world.p2 = p.createParticle(550, 0, 10, r.GetScreenHeight(),)
-    world.p2.color = r.SKYBLUE
-
-    world.p3 = p.createParticle(0, r.GetScreenHeight() / 2, r.GetScreenWidth(), 100)
-    world.p3.color = r.SKYBLUE
-
-
-
-    return world;
-
+    return data;
 }
 
-function update(world) {
-    s.updateHorzintalScanner(world.s1, world.p1, world.p2);
-    s.updateHorzintalScanner(world.s2, world.p1, world.p2);
-    s.verticalScanner(world.s3, world.p3);
+function update(data) {
+    s.updateHorzintalScanner(data.s1, data.p1, data.p2);
+    s.updateHorzintalScanner(data.s2, data.p1, data.p2);
+    s.verticalScanner(data.s3, data.p3);
 }
 
-
-function draw(world) {
+function draw(data) {
     r.BeginDrawing();
     r.ClearBackground(r.BLACK);
 
-    p.draw(world.p1);
-    p.draw(world.p2);
-    p.draw(world.p3);
+    p.draw(data.p1);
+    p.draw(data.p2);
+    p.draw(data.p3);
 
-    s.draw(world.s1);
-    s.draw(world.s2);
-    s.draw(world.s3);
+    s.draw(data.s1);
+    s.draw(data.s2);
+    s.draw(data.s3);
 
     r.EndDrawing();
 }

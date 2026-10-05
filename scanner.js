@@ -1,11 +1,36 @@
 const r = require('raylib')
 
-function isOverlap(scannerStart, scannerEnd, particleStart, particleEnd) {
-    return (scannerStart < particleEnd && particleStart < scannerEnd)
+function createScanner(x, y, width, height, velocity, color) {
+    return {
+        x: x,
+        y: y,
+        height: height,
+        width: width,
+        velocity: velocity,
+        color: color,
+    }
 }
 
-function getNewVelocity(posX, width, lower, upper, velocity) {
-    let isScannerOut = isScannerOutOfBound(posX, lower, upper, width);
+function draw(s) {
+    r.DrawRectangle(s.x, s.y, s.width, s.height, s.color)
+}
+
+function isOverlap(start, end, particle_Start, particle_End) {
+    return (start < particle_End && particle_Start < end)
+}
+
+function hasOverlaped(start, end, particle1Start, particle1Range, particle2Start, particle2Range) {
+    const leftRange = isOverlap(start, end, particle1Start, particle1Range)
+    const rightRange = isOverlap(start, end, particle2Start, particle2Range)
+    return leftRange || rightRange;
+}
+
+function isScannerOutOfBound(pos, lower, upper) {
+    return pos > upper || pos < lower;
+}
+
+function updateVelocity(pos, width, lower, upper, velocity) {
+    const isScannerOut = isScannerOutOfBound(pos, lower, upper, width);
     return isScannerOut ? -velocity : velocity;
 }
 
@@ -13,66 +38,39 @@ function updatePosition(start, velocity) {
     return start + velocity;
 }
 
-function isScannerOutOfBound(posX, lower, upper) {
-    return posX > upper || posX < lower;
+function colorSelector(start, end, particle1Start, particle1Range, particle2Start, particle2Range) {
+    const isOverlapping = hasOverlaped(start, end, particle1Start, particle1Range, particle2Start, particle2Range);
+    const color = isOverlapping ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
+    return color;
 }
 
-function hasOverlaped(scannerStart, scannerEnd, particle1Start, particle1End, particle2Start, particle2End) {
-    const leftRange = isOverlap(scannerStart, scannerEnd, particle1Start, particle1End)
-    const rightRange = isOverlap(scannerStart, scannerEnd, particle2Start, particle2End)
-    return leftRange || rightRange;
-}
+function updateHorzintalScanner(s, p1, p2) {
+    const scanner = s.x + s.width;
+    const particle1Range = p1.x + p1.width;
+    const particle2Range = p2.x + p2.width;
 
-function colorSelector(scannerStart, scannerEnd, particle1Start, particle1End, particle2Start, particle2End) {
-    let isOverlapping = hasOverlaped(scannerStart, scannerEnd, particle1Start, particle1End, particle2Start, particle2End);
-    let color = isOverlapping ? r.ColorAlpha(r.RED, 0.7) : r.WHITE;
-    return color
-}
+    s.velocity = updateVelocity(s.x, s.width, s.lower, s.upper, s.velocity);
+    s.x = updatePosition(s.x, s.velocity);
+    s.color = colorSelector(s.x, scanner, p1.x, particle1Range, p2.x, particle2Range);
 
-
-function updateHorzintalScanner(d, p, p2) {
-    const scanner = d.x + d.width;
-    const firstParticleEnd = p.x + p.width;
-    const secondParticleEnd = p2.x + p2.width;
-
-    d.velocity = getNewVelocity(d.x, d.width, d.lower, d.upper, d.velocity);
-    d.x = updatePosition(d.x, d.velocity);
-    d.color = colorSelector(d.x, scanner, p.x, firstParticleEnd, p2.x, secondParticleEnd);
-
-    return d;
+    return s;
 
 }
 
-function verticalScanner(d, p) {
+function verticalScanner(s, p) {
 
-    const verticalScannerEnd = d.y + d.height
+    const verticalScannerEnd = s.y + s.height
     const verticalParticleEnd = p.y + p.height
 
-    d.velocity = getNewVelocity(d.y, d.height, d.lower, d.upper, d.velocity);
-    d.y = updatePosition(d.y, d.velocity);
-    d.color = colorSelector(d.y, verticalScannerEnd, p.y, verticalParticleEnd);
-    return d;
-}
-
-function draw(d) {
-    r.DrawRectangle(d.x, d.y, d.width, d.height, d.color)
-
-}
-
-
-function createScanner(x, y, width, height) {
-    return {
-        x: x,
-        y: y,
-        height: height,
-        width: width,
-    }
-
+    s.velocity = updateVelocity(s.y, s.height, s.lower, s.upper, s.velocity);
+    s.y = updatePosition(s.y, s.velocity);
+    s.color = colorSelector(s.y, verticalScannerEnd, p.y, verticalParticleEnd);
+    return s;
 }
 
 module.exports = {
+    draw,
     createScanner,
     updateHorzintalScanner,
     verticalScanner,
-    draw,
 }

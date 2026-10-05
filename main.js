@@ -1,16 +1,23 @@
 const sketch = require("./sketch");
 
-function loop(world) {
+const window = {
+    width: 800,
+    height: 500,
+    FPS: 50,
+    title: "Partical Detector."
+
+}
+
+function loop(data) {
     while (sketch.running()) {
-        sketch.update(world);
-        sketch.draw(world);
+        sketch.update(data);
+        sketch.draw(data);
     }
 }
 
 function main() {
-    const world = sketch.setup(800, 500, "Partical Detector", 50);
-    loop(world);
+    const data = sketch.setup(window);
+    loop(data);
     sketch.teardown();
 }
-
 main();
